@@ -28,8 +28,11 @@ containerd cache.
 | uv | 0.11.32 | `${RUNNER_TOOL_CACHE}/uv/0.11.32/x86_64` | `astral-sh/setup-uv` |
 | buf | 1.50.0 | `${RUNNER_TOOL_CACHE}/buf/1.50.0/x64` | `bufbuild/buf-setup-action` |
 | bun | 1.3.14 | `/home/runner/.bun/bin/bun` | `oven-sh/setup-bun` |
+| gh | 2.96.0 | `/usr/local/bin/gh` | on `PATH` |
 
 Docker CLI and buildx come from the upstream base image and are not re-installed here.
+`gh` is a plain system CLI on `PATH` rather than a tool-cache entry, so it needs no
+`setup-*` action and no version pin in the workflow — it is used as-is.
 
 `pnpm` is deliberately **not** baked: `pnpm/action-setup` deletes its install directory and
 reinstalls from npm on every run, so a pre-installed copy is never used.

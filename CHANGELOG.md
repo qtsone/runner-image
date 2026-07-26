@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+# [1.1.0](https://github.com/qtsone/runner-image/compare/v1.0.0...v1.1.0) (2026-07-26)
+
+
+### Features
+
+* add GitHub CLI (gh) to the runner image ([6659305](https://github.com/qtsone/runner-image/commit/6659305a3c75c0afbe125aa7f579e322af86ca9f))
+
 # 1.0.0 (2026-07-26)
 
 

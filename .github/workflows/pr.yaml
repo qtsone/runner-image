@@ -1,0 +1,25 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'docker/**'
+
+jobs:
+  pr-checks:
+    # Deliberately not arc-*: this workflow builds the very image those runners run on,
+    # so keeping it on a hosted runner avoids a bad build being unable to fix itself.
+    runs-on: ubuntu-latest
+    environment: pr-checks
+    permissions:
+      contents: read
+      pull-requests: write
+      packages: write
+    steps:
+    - name: Docker Tests
+      uses: qtsone/actions/docker/tests@main
+      with:
+        image-name: qtsone/runner
+        dockerfile-path: docker/Dockerfile
+        github-token: ${{ secrets.GITHUB_TOKEN }}

@@ -17,6 +17,11 @@ jobs:
       pull-requests: write
       packages: write
     steps:
+    # docker/tests has no checkout of its own (unlike docker/build), so the workspace is
+    # empty unless we check out first — hadolint and buildx would both fail with
+    # "docker/Dockerfile: does not exist".
+    - name: Checkout
+      uses: actions/checkout@v4
     - name: Docker Tests
       uses: qtsone/actions/docker/tests@main
       with:

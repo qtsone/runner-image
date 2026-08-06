@@ -12,7 +12,7 @@ permissions:
 jobs:
   build-and-push:
     # See pr.yaml — kept on a hosted runner so this image can always be rebuilt.
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.GHA_RUNNER_OVERRIDE || (github.event.repository.custom_properties.GHA_RUNNER_TYPE == 'PRIVATE' && format('arc-{0}', github.event.repository.custom_properties.GHA_RUNNER_SIZE) || 'ubuntu-latest') }}
     steps:
     - name: Build and Push Docker Image
       uses: qtsone/actions/docker/build@main

@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   gitleaks:
-    runs-on: ${{ vars.GHA_RUNNER_OVERRIDE || (github.event.repository.private && github.event.repository.custom_properties.GHA_RUNNER_TYPE == 'PRIVATE' && format('arc-{0}', github.event.repository.custom_properties.GHA_RUNNER_SIZE) || 'ubuntu-latest') }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4

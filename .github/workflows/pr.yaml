@@ -8,11 +8,9 @@ on:
 
 jobs:
   pr-checks:
-    # Deliberately not arc-*: this workflow builds the very image those runners run on,
-    # so keeping it on a hosted runner avoids a bad build being unable to fix itself.
-    # The repository.private guard also keeps public repos off arc-* entirely: the org
-    # runner group rejects them, so their jobs would queue forever instead of falling back.
-    runs-on: ${{ vars.GHA_RUNNER_OVERRIDE || (github.event.repository.private && github.event.repository.custom_properties.GHA_RUNNER_TYPE == 'PRIVATE' && format('arc-{0}', github.event.repository.custom_properties.GHA_RUNNER_SIZE) || 'ubuntu-latest') }}
+    # Hosted, never arc-*: this workflow builds the very image those runners run on,
+    # so a bad build must not need a working self-hosted runner to fix itself.
+    runs-on: ubuntu-latest
     environment: pr-checks
     permissions:
       contents: read

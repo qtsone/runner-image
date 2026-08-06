@@ -9,7 +9,7 @@ on:
 
 jobs:
   release:
-    runs-on: ${{ vars.GHA_RUNNER_OVERRIDE || (github.event.repository.private && github.event.repository.custom_properties.GHA_RUNNER_TYPE == 'PRIVATE' && format('arc-{0}', github.event.repository.custom_properties.GHA_RUNNER_SIZE) || 'ubuntu-latest') }}
+    runs-on: ubuntu-latest
     permissions:
       contents: write       # to be able to publish a GitHub release
       issues: write         # to be able to comment on released issues

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+# [1.2.0](https://github.com/qtsone/runner-image/compare/v1.1.0...v1.2.0) (2026-08-06)
+
+
+### Features
+
+* add kubectl and kustomize to the runner image ([2ea6bc3](https://github.com/qtsone/runner-image/commit/2ea6bc3ffff9f040442a99b9e97eb20a816667cb))
+
 # [1.1.0](https://github.com/qtsone/runner-image/compare/v1.0.0...v1.1.0) (2026-07-26)
 
 

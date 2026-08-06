@@ -44,7 +44,7 @@ RUN echo "Installing GitHub CLI" \
   && rm -rf "/tmp/gh_${GH_VERSION}_linux_amd64" \
   && gh --version
 
-# Keep kubectl within one minor version of the Hetzner cluster's API server (the supported
+# Keep kubectl within one minor version of the target cluster's API server (the supported
 # skew range) when bumping either side.
 RUN echo "Installing kubectl" \
   && curl -fsSL "https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl" -o /tmp/kubectl \

@@ -1,7 +1,7 @@
 # runner-image
 
-`ghcr.io/qtsone/runner` — the Actions Runner Controller (ARC) runner image used by the
-`arc-small` / `arc-medium` / `arc-large` scale sets in the Hetzner cluster.
+`ghcr.io/qtsone/runner` — the Actions Runner Controller (ARC) runner image used by our
+self-hosted runner scale sets.
 
 Built from `ghcr.io/actions/actions-runner`, with two things added: a real `ENTRYPOINT`,
 and a pre-populated tool cache.
@@ -36,7 +36,7 @@ Docker CLI and buildx come from the upstream base image and are not re-installed
 `gh`, `kubectl`, and `kustomize` are plain system CLIs on `PATH` rather than tool-cache
 entries, so they need no `setup-*` action and no version pin in the workflow — they are
 used as-is. When bumping `KUBECTL_VERSION`, keep it within one minor version of the
-Hetzner cluster's API server (the supported client/server skew range).
+target cluster's API server (the supported client/server skew range).
 
 `pnpm` is deliberately **not** baked: `pnpm/action-setup` deletes its install directory and
 reinstalls from npm on every run, so a pre-installed copy is never used.
@@ -68,8 +68,8 @@ Bump the relevant `ARG` in [`docker/Dockerfile`](docker/Dockerfile) and open a P
 step ends in a `--version` invocation, so a wrong URL or changed archive layout fails the build
 rather than producing a quietly broken image.
 
-When bumping `RUNNER_VERSION`, keep it aligned with the image tag pinned in `cloud-1` at
-`gitops/services/arc/runner/environments/hetzner/values.yaml`.
+When bumping `RUNNER_VERSION`, keep it aligned with the image tag pinned in the internal
+deployment repo.
 
 Releases are cut by semantic-release from Conventional Commits on `main`; the tag push builds
 and publishes `ghcr.io/qtsone/runner`.

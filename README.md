@@ -29,10 +29,14 @@ containerd cache.
 | buf | 1.50.0 | `${RUNNER_TOOL_CACHE}/buf/1.50.0/x64` | `bufbuild/buf-setup-action` |
 | bun | 1.3.14 | `/home/runner/.bun/bin/bun` | `oven-sh/setup-bun` |
 | gh | 2.96.0 | `/usr/local/bin/gh` | on `PATH` |
+| kubectl | 1.36.3 | `/usr/local/bin/kubectl` | on `PATH` |
+| kustomize | 5.8.1 | `/usr/local/bin/kustomize` | on `PATH` |
 
 Docker CLI and buildx come from the upstream base image and are not re-installed here.
-`gh` is a plain system CLI on `PATH` rather than a tool-cache entry, so it needs no
-`setup-*` action and no version pin in the workflow — it is used as-is.
+`gh`, `kubectl`, and `kustomize` are plain system CLIs on `PATH` rather than tool-cache
+entries, so they need no `setup-*` action and no version pin in the workflow — they are
+used as-is. When bumping `KUBECTL_VERSION`, keep it within one minor version of the
+Hetzner cluster's API server (the supported client/server skew range).
 
 `pnpm` is deliberately **not** baked: `pnpm/action-setup` deletes its install directory and
 reinstalls from npm on every run, so a pre-installed copy is never used.

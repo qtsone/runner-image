@@ -11,6 +11,8 @@ ARG UV_VERSION="0.11.32"
 ARG BUF_VERSION="1.50.0"
 ARG BUN_VERSION="1.3.14"
 ARG GH_VERSION="2.96.0"
+ARG KUBECTL_VERSION="1.36.3"
+ARG KUSTOMIZE_VERSION="5.8.1"
 
 # The runner picks its tool cache from RUNNER_TOOL_CACHE, then RUNNER_TOOLSDIRECTORY,
 # then AGENT_TOOLSDIRECTORY, and only then falls back to <work>/_tool
@@ -32,14 +34,30 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# gh is a plain system CLI (like the Docker CLI inherited from the base image), not a setup-*
-# tool-cache entry, so it goes on PATH at /usr/local/bin rather than under RUNNER_TOOL_CACHE.
+# gh, kubectl, and kustomize are plain system CLIs (like the Docker CLI inherited from the
+# base image), not setup-* tool-cache entries, so they go on PATH at /usr/local/bin rather
+# than under RUNNER_TOOL_CACHE.
 RUN echo "Installing GitHub CLI" \
   && curl -fsSL "https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz" \
      | tar -xz -C /tmp \
   && install -m 0755 "/tmp/gh_${GH_VERSION}_linux_amd64/bin/gh" /usr/local/bin/gh \
   && rm -rf "/tmp/gh_${GH_VERSION}_linux_amd64" \
   && gh --version
+
+# Keep kubectl within one minor version of the Hetzner cluster's API server (the supported
+# skew range) when bumping either side.
+RUN echo "Installing kubectl" \
+  && curl -fsSL "https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl" -o /tmp/kubectl \
+  && install -m 0755 /tmp/kubectl /usr/local/bin/kubectl \
+  && rm /tmp/kubectl \
+  && kubectl version --client
+
+RUN echo "Installing kustomize" \
+  && curl -fsSL "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz" \
+     | tar -xz -C /tmp \
+  && install -m 0755 /tmp/kustomize /usr/local/bin/kustomize \
+  && rm /tmp/kustomize \
+  && kustomize version
 
 # Own the cache up front and drop to uid 1001 for every download below. A `chown -R` after
 # the fact would copy the entire baked tool cache into a new layer and roughly double the

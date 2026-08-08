@@ -1,24 +1,53 @@
 # syntax=docker/dockerfile:1
 # https://docs.docker.com/engine/reference/builder/
 
+# Every ARG below carries a `# renovate:` annotation so Renovate can track it; see
+# .github/renovate.json5. RUNNER_VERSION needs none — Renovate's dockerfile manager
+# resolves it through the FROM below on its own.
 ARG RUNNER_VERSION="2.336.0"
 FROM ghcr.io/actions/actions-runner:${RUNNER_VERSION}
 
+# node-version + `node` versioning together mean only LTS lines are ever offered: the
+# datasource marks non-LTS releases unstable and the versioning refuses a major that has
+# not reached its LTS date.
+# renovate: datasource=node-version depName=node versioning=node
 ARG NODE_VERSION="24.19.0"
-ARG PYTHON_VERSION="3.12.13"
-ARG PYTHON_RELEASE="3.12.13-27650778726"
+
+# actions/python-versions tags a release <python-version>-<build-id> and names the tarball
+# inside it by the python version alone. One pin, with the python version derived from it
+# below — as two ARGs, an update to either alone yields a 404 at build time.
+# The versioning drops release-candidate tags (3.15.0-rc.1-309...), which do not match, and
+# orders the rest by build id so a rebuild of an unchanged python version is still an update.
+# renovate: datasource=github-releases depName=actions/python-versions versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-(?<build>\d+)$
+ARG PYTHON_RELEASE_VERSION="3.12.13-27650778726"
+
+# renovate: datasource=github-releases depName=astral-sh/uv
 ARG UV_VERSION="0.11.32"
+# renovate: datasource=github-releases depName=bufbuild/buf extractVersion=^v(?<version>.+)$
 ARG BUF_VERSION="1.50.0"
+# renovate: datasource=github-releases depName=oven-sh/bun extractVersion=^bun-v(?<version>.+)$
 ARG BUN_VERSION="1.3.14"
+# renovate: datasource=github-releases depName=cli/cli extractVersion=^v(?<version>.+)$
 ARG GH_VERSION="2.96.0"
+# renovate: datasource=github-releases depName=kubernetes/kubernetes extractVersion=^v(?<version>.+)$
 ARG KUBECTL_VERSION="1.36.3"
+# kubernetes-sigs/kustomize also tags kyaml/ and cmd/config/ releases; the prefix in
+# extractVersion is what filters those out.
+# renovate: datasource=github-releases depName=kubernetes-sigs/kustomize extractVersion=^kustomize/v(?<version>.+)$
 ARG KUSTOMIZE_VERSION="5.8.1"
+# renovate: datasource=github-releases depName=jqlang/jq extractVersion=^jq-(?<version>.+)$
 ARG JQ_VERSION="1.8.2"
+# renovate: datasource=github-releases depName=mikefarah/yq extractVersion=^v(?<version>.+)$
 ARG YQ_VERSION="4.53.3"
+
 # Keep these three in lockstep with qtsone/actions/release: the action's semantic-version
-# input default, plus the resolved versions of its two default extra-plugins.
+# input default, plus the resolved versions of its two default extra-plugins. Renovate
+# groups them into one un-automergeable PR so the action can be bumped in the same breath.
+# renovate: datasource=npm depName=semantic-release
 ARG SEMANTIC_RELEASE_VERSION="24.2.0"
+# renovate: datasource=npm depName=@semantic-release/changelog
 ARG SEMANTIC_RELEASE_CHANGELOG_VERSION="7.0.0"
+# renovate: datasource=npm depName=@semantic-release/git
 ARG SEMANTIC_RELEASE_GIT_VERSION="11.0.1"
 
 # The runner picks its tool cache from RUNNER_TOOL_CACHE, then RUNNER_TOOLSDIRECTORY,
@@ -122,8 +151,9 @@ RUN echo "Installing semantic-release into the baked Node" \
 # the arch directory, creates the python/pythonX.Y symlinks setup-python expects, upgrades
 # pip, and writes the .complete marker. Reuse it rather than reproducing that layout by hand.
 RUN echo "Installing Python into the tool cache" \
+  && PYTHON_VERSION="${PYTHON_RELEASE_VERSION%%-*}" \
   && mkdir -p /tmp/python \
-  && curl -fsSL "https://github.com/actions/python-versions/releases/download/${PYTHON_RELEASE}/python-${PYTHON_VERSION}-linux-24.04-x64.tar.gz" \
+  && curl -fsSL "https://github.com/actions/python-versions/releases/download/${PYTHON_RELEASE_VERSION}/python-${PYTHON_VERSION}-linux-24.04-x64.tar.gz" \
      | tar -xz -C /tmp/python \
   && cd /tmp/python \
   && bash ./setup.sh \

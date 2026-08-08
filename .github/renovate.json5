@@ -1,0 +1,89 @@
+{
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  extends: [
+    'config:recommended',
+    ':semanticCommits',
+    // Read the `# renovate:` annotations above each ARG in docker/Dockerfile and above
+    // GITLEAKS_VERSION in .github/workflows/gitleaks.yaml. Both presets also carry the
+    // `extractVersion=` support the tag-prefixed upstreams (buf, bun, jq, kustomize, …) need.
+    'customManagers:dockerfileVersions',
+    'customManagers:githubActionsVersions',
+  ],
+
+  timezone: 'Europe/Bucharest',
+
+  // `main` is unprotected and the repo has auto-merge disabled, so GitHub has nothing to gate
+  // a PR on and cannot hold it open until checks finish — Renovate merges via the API itself.
+  // Enable branch protection and repo auto-merge upstream and this can go back to the default.
+  platformAutomerge: false,
+  automergeStrategy: 'squash',
+
+  // Renovate capitalises the verb once a rule sets commitMessagePrefix explicitly, which would
+  // leave the rules below disagreeing on case.
+  commitMessageAction: 'update',
+
+  // An automerged bump here reaches every self-hosted runner on the next image pull, with no
+  // human between the upstream release and production. Let a bad release be yanked first.
+  minimumReleaseAge: '3 days',
+
+  packageRules: [
+    {
+      // docker/Dockerfile *is* the published product, and release.yaml is path-filtered to
+      // docker/**. commit-analyzer cuts no release for `chore`, so a chore-prefixed bump would
+      // merge, produce no tag, and tags.yaml would never fire — the new version would be
+      // committed and shipped to nobody. `semanticCommitType` is unreliable inside a
+      // packageRule; only an explicit prefix works.
+      description: 'Image contents — must cut a release',
+      matchFileNames: ['docker/Dockerfile'],
+      commitMessagePrefix: 'fix(docker):',
+    },
+    {
+      // Nothing here reaches the published image, and release.yaml never runs for these paths.
+      description: 'Own CI — no consumer impact',
+      matchFileNames: ['.github/workflows/**'],
+      commitMessagePrefix: 'chore(deps):',
+      additionalBranchPrefix: 'ci-',
+    },
+    {
+      // A new Node or Python major changes what every job on this image gets by default, which
+      // is a capability change to the image rather than a repair. Ordered after the rule above
+      // so it wins for majors only.
+      description: 'Major tool bump — ships as a minor image release',
+      matchFileNames: ['docker/Dockerfile'],
+      matchUpdateTypes: ['major'],
+      commitMessagePrefix: 'feat(docker):',
+    },
+    {
+      // Every merge here triggers a release, a rebuild, and a re-pull on every runner, so the
+      // baked tools travel together. `custom.regex` is what scopes this to the annotated ARGs
+      // and leaves the actions-runner base image (found by the `dockerfile` manager, via FROM)
+      // in a PR of its own — that one is an ARC compatibility change, not a baked tool.
+      description: 'Baked toolchain — one PR, one image release',
+      matchManagers: ['custom.regex'],
+      matchFileNames: ['docker/Dockerfile'],
+      matchUpdateTypes: ['minor', 'patch', 'pin', 'digest'],
+      groupName: 'baked toolchain',
+    },
+    {
+      description: 'Automerge everything below a major',
+      matchUpdateTypes: ['minor', 'patch', 'pin', 'digest'],
+      automerge: true,
+    },
+    {
+      // qtsone/actions/release runs `npm install -g semantic-release@<its own default>` at the
+      // start of every release job; that is a fast no-op only while the baked versions match it
+      // exactly. Drift costs a full install per job — silently, since nothing fails. Bumping
+      // here means bumping that action's `semantic-version` input default too, so this group
+      // opts out of the automerge rule above rather than sliding in unread.
+      description: 'semantic-release — locked to qtsone/actions/release',
+      matchFileNames: ['docker/Dockerfile'],
+      matchDepNames: [
+        'semantic-release',
+        '@semantic-release/changelog',
+        '@semantic-release/git',
+      ],
+      groupName: 'semantic-release',
+      automerge: false,
+    },
+  ],
+}

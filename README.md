@@ -31,11 +31,13 @@ containerd cache.
 | gh | 2.96.0 | `/usr/local/bin/gh` | on `PATH` |
 | kubectl | 1.36.3 | `/usr/local/bin/kubectl` | on `PATH` |
 | kustomize | 5.8.1 | `/usr/local/bin/kustomize` | on `PATH` |
+| jq | 1.8.2 | `/usr/local/bin/jq` | on `PATH` |
+| yq | 4.53.3 | `/usr/local/bin/yq` | on `PATH` |
 
 Docker CLI and buildx come from the upstream base image and are not re-installed here.
-`gh`, `kubectl`, and `kustomize` are plain system CLIs on `PATH` rather than tool-cache
-entries, so they need no `setup-*` action and no version pin in the workflow — they are
-used as-is. When bumping `KUBECTL_VERSION`, keep it within one minor version of the
+`gh`, `kubectl`, `kustomize`, `jq`, and `yq` (mikefarah's Go implementation) are plain
+system CLIs on `PATH` rather than tool-cache entries, so they need no `setup-*` action
+and no version pin in the workflow — they are used as-is. When bumping `KUBECTL_VERSION`, keep it within one minor version of the
 target cluster's API server (the supported client/server skew range).
 
 `pnpm` is deliberately **not** baked: `pnpm/action-setup` deletes its install directory and

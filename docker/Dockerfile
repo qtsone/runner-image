@@ -13,6 +13,8 @@ ARG BUN_VERSION="1.3.14"
 ARG GH_VERSION="2.96.0"
 ARG KUBECTL_VERSION="1.36.3"
 ARG KUSTOMIZE_VERSION="5.8.1"
+ARG JQ_VERSION="1.8.2"
+ARG YQ_VERSION="4.53.3"
 
 # The runner picks its tool cache from RUNNER_TOOL_CACHE, then RUNNER_TOOLSDIRECTORY,
 # then AGENT_TOOLSDIRECTORY, and only then falls back to <work>/_tool
@@ -58,6 +60,18 @@ RUN echo "Installing kustomize" \
   && install -m 0755 /tmp/kustomize /usr/local/bin/kustomize \
   && rm /tmp/kustomize \
   && kustomize version
+
+RUN echo "Installing jq" \
+  && curl -fsSL "https://github.com/jqlang/jq/releases/download/jq-${JQ_VERSION}/jq-linux-amd64" -o /tmp/jq \
+  && install -m 0755 /tmp/jq /usr/local/bin/jq \
+  && rm /tmp/jq \
+  && jq --version
+
+RUN echo "Installing yq" \
+  && curl -fsSL "https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64" -o /tmp/yq \
+  && install -m 0755 /tmp/yq /usr/local/bin/yq \
+  && rm /tmp/yq \
+  && yq --version
 
 # Own the cache up front and drop to uid 1001 for every download below. A `chown -R` after
 # the fact would copy the entire baked tool cache into a new layer and roughly double the

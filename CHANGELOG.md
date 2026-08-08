@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+# [1.3.0](https://github.com/qtsone/runner-image/compare/v1.2.0...v1.3.0) (2026-08-08)
+
+
+### Features
+
+* **docker:** bake jq and yq ([bb9b4c0](https://github.com/qtsone/runner-image/commit/bb9b4c07354a7990e4afdefd0d4ccc0e0e3f1e5c))
+* **docker:** bake semantic-release natively ([7a0aa76](https://github.com/qtsone/runner-image/commit/7a0aa76a7f876e58a8b25fba7a37d9e20674fd4e))
+* **docker:** bump Node.js to 24.19.0 ([7fffdf4](https://github.com/qtsone/runner-image/commit/7fffdf42b3c641b3175d32ef9f82bab33b80a10e))
+
 # [1.2.0](https://github.com/qtsone/runner-image/compare/v1.1.0...v1.2.0) (2026-08-06)
 
 

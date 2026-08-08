@@ -23,7 +23,7 @@ containerd cache.
 
 | Tool | Version | Where | Found by |
 |---|---|---|---|
-| Node.js | 22.23.1 | `${RUNNER_TOOL_CACHE}/node/22.23.1/x64` | `actions/setup-node` |
+| Node.js | 24.19.0 | `${RUNNER_TOOL_CACHE}/node/24.19.0/x64` | `actions/setup-node` |
 | Python | 3.12.13 | `${RUNNER_TOOL_CACHE}/Python/3.12.13/x64` | `actions/setup-python` |
 | uv | 0.11.32 | `${RUNNER_TOOL_CACHE}/uv/0.11.32/x86_64` | `astral-sh/setup-uv` |
 | buf | 1.50.0 | `${RUNNER_TOOL_CACHE}/buf/1.50.0/x64` | `bufbuild/buf-setup-action` |
@@ -57,7 +57,7 @@ A baked tool is only used if the workflow asks for a version that matches it. Th
 per action, and two of them need the workflow to pin a version:
 
 - `setup-node` and `setup-python` resolve semver **ranges** against the cache, so
-  `node-version: 22` and `python-version: "3.12"` hit the baked copies as-is.
+  `node-version: 24` and `python-version: "3.12"` hit the baked copies as-is.
 - `buf-setup-action` defaults to `1.50.0`, which is what is baked — a hit without changes.
 - `setup-uv` resolves `latest` to a concrete version *before* checking the cache, so the
   baked copy stops being used the day a newer uv ships. Pin `version: 0.11.32` for a

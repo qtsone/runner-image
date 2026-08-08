@@ -33,6 +33,7 @@ containerd cache.
 | kustomize | 5.8.1 | `/usr/local/bin/kustomize` | on `PATH` |
 | jq | 1.8.2 | `/usr/local/bin/jq` | on `PATH` |
 | yq | 4.53.3 | `/usr/local/bin/yq` | on `PATH` |
+| semantic-release | 24.2.0 | global in the baked Node | on `PATH` |
 
 Docker CLI and buildx come from the upstream base image and are not re-installed here.
 `gh`, `kubectl`, `kustomize`, `jq`, and `yq` (mikefarah's Go implementation) are plain
@@ -42,6 +43,13 @@ target cluster's API server (the supported client/server skew range).
 
 `pnpm` is deliberately **not** baked: `pnpm/action-setup` deletes its install directory and
 reinstalls from npm on every run, so a pre-installed copy is never used.
+
+The baked Node's `bin` directory is on `PATH`, so `node`, `npm`, and `semantic-release`
+work natively without a `setup-node` step — the same as GitHub-hosted runners.
+`semantic-release` 24.2.0 is installed globally together with `@semantic-release/changelog`
+7.0.0 and `@semantic-release/git` 11.0.1: exactly what `qtsone/actions/release` installs at
+run time (its `semantic-version` input default plus its default `extra-plugins`). Keep the
+`SEMANTIC_RELEASE_*` args in lockstep with that action when bumping either side.
 
 ## Getting a cache hit
 

@@ -4,7 +4,7 @@
 ARG RUNNER_VERSION="2.336.0"
 FROM ghcr.io/actions/actions-runner:${RUNNER_VERSION}
 
-ARG NODE_VERSION="22.23.1"
+ARG NODE_VERSION="24.19.0"
 ARG PYTHON_VERSION="3.12.13"
 ARG PYTHON_RELEASE="3.12.13-27650778726"
 ARG UV_VERSION="0.11.32"
@@ -13,6 +13,13 @@ ARG BUN_VERSION="1.3.14"
 ARG GH_VERSION="2.96.0"
 ARG KUBECTL_VERSION="1.36.3"
 ARG KUSTOMIZE_VERSION="5.8.1"
+ARG JQ_VERSION="1.8.2"
+ARG YQ_VERSION="4.53.3"
+# Keep these three in lockstep with qtsone/actions/release: the action's semantic-version
+# input default, plus the resolved versions of its two default extra-plugins.
+ARG SEMANTIC_RELEASE_VERSION="24.2.0"
+ARG SEMANTIC_RELEASE_CHANGELOG_VERSION="7.0.0"
+ARG SEMANTIC_RELEASE_GIT_VERSION="11.0.1"
 
 # The runner picks its tool cache from RUNNER_TOOL_CACHE, then RUNNER_TOOLSDIRECTORY,
 # then AGENT_TOOLSDIRECTORY, and only then falls back to <work>/_tool
@@ -21,6 +28,12 @@ ARG KUSTOMIZE_VERSION="5.8.1"
 # and every setup-* action would silently re-download. Do not remove this.
 ENV RUNNER_TOOL_CACHE=/opt/hostedtoolcache
 ENV BUN_INSTALL=/home/runner/.bun
+
+# The baked Node's bin dir goes on PATH so node, npm, and the globally installed
+# semantic-release below run natively — no setup-node step — matching GitHub-hosted
+# runners, where node is always on PATH. A setup-node that installs a different
+# version prepends its own path and still wins.
+ENV PATH="${RUNNER_TOOL_CACHE}/node/${NODE_VERSION}/x64/bin:${PATH}"
 
 USER root
 
@@ -59,6 +72,18 @@ RUN echo "Installing kustomize" \
   && rm /tmp/kustomize \
   && kustomize version
 
+RUN echo "Installing jq" \
+  && curl -fsSL "https://github.com/jqlang/jq/releases/download/jq-${JQ_VERSION}/jq-linux-amd64" -o /tmp/jq \
+  && install -m 0755 /tmp/jq /usr/local/bin/jq \
+  && rm /tmp/jq \
+  && jq --version
+
+RUN echo "Installing yq" \
+  && curl -fsSL "https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64" -o /tmp/yq \
+  && install -m 0755 /tmp/yq /usr/local/bin/yq \
+  && rm /tmp/yq \
+  && yq --version
+
 # Own the cache up front and drop to uid 1001 for every download below. A `chown -R` after
 # the fact would copy the entire baked tool cache into a new layer and roughly double the
 # image. The runtime needs it writable anyway: a setup-* action asked for a version we did
@@ -80,6 +105,18 @@ RUN echo "Installing Node.js into the tool cache" \
      | tar -xJ -C "${NODE_DIR}" --strip-components=1 \
   && touch "${RUNNER_TOOL_CACHE}/node/${NODE_VERSION}/x64.complete" \
   && "${NODE_DIR}/bin/node" --version
+
+# All three packages must go in one npm invocation: the plugins then land as siblings of
+# semantic-release in the global node_modules, which is where its plugin loader resolves
+# them from when the repo has no local install (it walks up from semantic-release's own
+# directory). Installed separately they would not be resolvable.
+RUN echo "Installing semantic-release into the baked Node" \
+  && npm install -g \
+       "semantic-release@${SEMANTIC_RELEASE_VERSION}" \
+       "@semantic-release/changelog@${SEMANTIC_RELEASE_CHANGELOG_VERSION}" \
+       "@semantic-release/git@${SEMANTIC_RELEASE_GIT_VERSION}" \
+  && rm -rf /home/runner/.npm \
+  && semantic-release --version
 
 # The python-versions tarball ships the same setup.sh GitHub's own images run: it lays out
 # the arch directory, creates the python/pythonX.Y symlinks setup-python expects, upgrades

@@ -23,7 +23,7 @@ containerd cache.
 
 | Tool | Version | Where | Found by |
 |---|---|---|---|
-| Node.js | 22.23.1 | `${RUNNER_TOOL_CACHE}/node/22.23.1/x64` | `actions/setup-node` |
+| Node.js | 24.19.0 | `${RUNNER_TOOL_CACHE}/node/24.19.0/x64` | `actions/setup-node` |
 | Python | 3.12.13 | `${RUNNER_TOOL_CACHE}/Python/3.12.13/x64` | `actions/setup-python` |
 | uv | 0.11.32 | `${RUNNER_TOOL_CACHE}/uv/0.11.32/x86_64` | `astral-sh/setup-uv` |
 | buf | 1.50.0 | `${RUNNER_TOOL_CACHE}/buf/1.50.0/x64` | `bufbuild/buf-setup-action` |
@@ -31,15 +31,25 @@ containerd cache.
 | gh | 2.96.0 | `/usr/local/bin/gh` | on `PATH` |
 | kubectl | 1.36.3 | `/usr/local/bin/kubectl` | on `PATH` |
 | kustomize | 5.8.1 | `/usr/local/bin/kustomize` | on `PATH` |
+| jq | 1.8.2 | `/usr/local/bin/jq` | on `PATH` |
+| yq | 4.53.3 | `/usr/local/bin/yq` | on `PATH` |
+| semantic-release | 24.2.0 | global in the baked Node | on `PATH` |
 
 Docker CLI and buildx come from the upstream base image and are not re-installed here.
-`gh`, `kubectl`, and `kustomize` are plain system CLIs on `PATH` rather than tool-cache
-entries, so they need no `setup-*` action and no version pin in the workflow — they are
-used as-is. When bumping `KUBECTL_VERSION`, keep it within one minor version of the
+`gh`, `kubectl`, `kustomize`, `jq`, and `yq` (mikefarah's Go implementation) are plain
+system CLIs on `PATH` rather than tool-cache entries, so they need no `setup-*` action
+and no version pin in the workflow — they are used as-is. When bumping `KUBECTL_VERSION`, keep it within one minor version of the
 target cluster's API server (the supported client/server skew range).
 
 `pnpm` is deliberately **not** baked: `pnpm/action-setup` deletes its install directory and
 reinstalls from npm on every run, so a pre-installed copy is never used.
+
+The baked Node's `bin` directory is on `PATH`, so `node`, `npm`, and `semantic-release`
+work natively without a `setup-node` step — the same as GitHub-hosted runners.
+`semantic-release` 24.2.0 is installed globally together with `@semantic-release/changelog`
+7.0.0 and `@semantic-release/git` 11.0.1: exactly what `qtsone/actions/release` installs at
+run time (its `semantic-version` input default plus its default `extra-plugins`). Keep the
+`SEMANTIC_RELEASE_*` args in lockstep with that action when bumping either side.
 
 ## Getting a cache hit
 
@@ -47,7 +57,7 @@ A baked tool is only used if the workflow asks for a version that matches it. Th
 per action, and two of them need the workflow to pin a version:
 
 - `setup-node` and `setup-python` resolve semver **ranges** against the cache, so
-  `node-version: 22` and `python-version: "3.12"` hit the baked copies as-is.
+  `node-version: 24` and `python-version: "3.12"` hit the baked copies as-is.
 - `buf-setup-action` defaults to `1.50.0`, which is what is baked — a hit without changes.
 - `setup-uv` resolves `latest` to a concrete version *before* checking the cache, so the
   baked copy stops being used the day a newer uv ships. Pin `version: 0.11.32` for a

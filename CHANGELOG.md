@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+# [1.4.0](https://github.com/qtsone/runner-image/compare/v1.3.1...v1.4.0) (2026-08-09)
+
+
+### Bug Fixes
+
+* **docker:** update baked toolchain ([49c1ba9](https://github.com/qtsone/runner-image/commit/49c1ba9d43848112ce48e883b7f543543d866d8e))
+
+
+### Features
+
+* **docker:** update dependency semantic-release to v25 ([c75bf69](https://github.com/qtsone/runner-image/commit/c75bf69f3801289b921a6999e4c4d8e6279ff044))
+
 ## [1.3.1](https://github.com/qtsone/runner-image/compare/v1.3.0...v1.3.1) (2026-08-09)
 
 

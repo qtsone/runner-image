@@ -44,7 +44,7 @@ ARG YQ_VERSION="4.53.3"
 # input default, plus the resolved versions of its two default extra-plugins. Renovate
 # groups them into one un-automergeable PR so the action can be bumped in the same breath.
 # renovate: datasource=npm depName=semantic-release
-ARG SEMANTIC_RELEASE_VERSION="24.2.9"
+ARG SEMANTIC_RELEASE_VERSION="25.0.9"
 # renovate: datasource=npm depName=@semantic-release/changelog
 ARG SEMANTIC_RELEASE_CHANGELOG_VERSION="7.0.0"
 # renovate: datasource=npm depName=@semantic-release/git

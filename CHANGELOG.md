@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.1](https://github.com/qtsone/runner-image/compare/v1.3.0...v1.3.1) (2026-08-09)
+
+
+### Bug Fixes
+
+* **docker:** update dependency semantic-release to v24.2.9 ([e441aae](https://github.com/qtsone/runner-image/commit/e441aae1799f29725b4862f8581a1da6bd14a5f3))
+
 # [1.3.0](https://github.com/qtsone/runner-image/compare/v1.2.0...v1.3.0) (2026-08-08)
 
 

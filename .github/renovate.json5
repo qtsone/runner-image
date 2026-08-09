@@ -65,16 +65,11 @@
       groupName: 'baked toolchain',
     },
     {
-      description: 'Automerge everything below a major',
-      matchUpdateTypes: ['minor', 'patch', 'pin', 'digest'],
-      automerge: true,
-    },
-    {
       // qtsone/actions/release runs `npm install -g semantic-release@<its own default>` at the
       // start of every release job; that is a fast no-op only while the baked versions match it
       // exactly. Drift costs a full install per job — silently, since nothing fails. Bumping
       // here means bumping that action's `semantic-version` input default too, so this group
-      // opts out of the automerge rule above rather than sliding in unread.
+      // opts out of the automerge rule below rather than sliding in unread.
       description: 'semantic-release — locked to qtsone/actions/release',
       matchFileNames: ['docker/Dockerfile'],
       matchDepNames: [
@@ -84,6 +79,11 @@
       ],
       groupName: 'semantic-release',
       automerge: false,
+    },
+    {
+      description: 'Automerge everything below a major',
+      matchUpdateTypes: ['minor', 'patch', 'pin', 'digest'],
+      automerge: true,
     },
   ],
 }

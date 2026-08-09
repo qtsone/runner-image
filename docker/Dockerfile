@@ -19,16 +19,16 @@ ARG NODE_VERSION="24.19.0"
 # The versioning drops release-candidate tags (3.15.0-rc.1-309...), which do not match, and
 # orders the rest by build id so a rebuild of an unchanged python version is still an update.
 # renovate: datasource=github-releases depName=actions/python-versions versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-(?<build>\d+)$
-ARG PYTHON_RELEASE_VERSION="3.12.13-27650778726"
+ARG PYTHON_RELEASE_VERSION="3.14.7-31064857500"
 
 # renovate: datasource=github-releases depName=astral-sh/uv
-ARG UV_VERSION="0.11.32"
+ARG UV_VERSION="0.12.2"
 # renovate: datasource=github-releases depName=bufbuild/buf extractVersion=^v(?<version>.+)$
-ARG BUF_VERSION="1.50.0"
+ARG BUF_VERSION="1.72.0"
 # renovate: datasource=github-releases depName=oven-sh/bun extractVersion=^bun-v(?<version>.+)$
 ARG BUN_VERSION="1.3.14"
 # renovate: datasource=github-releases depName=cli/cli extractVersion=^v(?<version>.+)$
-ARG GH_VERSION="2.96.0"
+ARG GH_VERSION="2.97.0"
 # renovate: datasource=github-releases depName=kubernetes/kubernetes extractVersion=^v(?<version>.+)$
 ARG KUBECTL_VERSION="1.36.3"
 # kubernetes-sigs/kustomize also tags kyaml/ and cmd/config/ releases; the prefix in

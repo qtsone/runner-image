@@ -22,7 +22,7 @@ ARG NODE_VERSION="24.19.0"
 ARG PYTHON_RELEASE_VERSION="3.14.7-31064857500"
 
 # renovate: datasource=github-releases depName=astral-sh/uv
-ARG UV_VERSION="0.12.4"
+ARG UV_VERSION="0.12.5"
 # renovate: datasource=github-releases depName=bufbuild/buf extractVersion=^v(?<version>.+)$
 ARG BUF_VERSION="1.72.0"
 # renovate: datasource=github-releases depName=oven-sh/bun extractVersion=^bun-v(?<version>.+)$

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.4](https://github.com/qtsone/runner-image/compare/v1.4.3...v1.4.4) (2026-08-22)
+
+
+### Bug Fixes
+
+* **docker:** update dependency mikefarah/yq to v4.53.4 ([#17](https://github.com/qtsone/runner-image/issues/17)) ([d9ad5c8](https://github.com/qtsone/runner-image/commit/d9ad5c88a520dca5e524d0b46efefe6eba816cd3))
+
 ## [1.4.3](https://github.com/qtsone/runner-image/compare/v1.4.2...v1.4.3) (2026-08-18)
 
 

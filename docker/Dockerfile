@@ -38,7 +38,7 @@ ARG KUSTOMIZE_VERSION="5.8.1"
 # renovate: datasource=github-releases depName=jqlang/jq extractVersion=^jq-(?<version>.+)$
 ARG JQ_VERSION="1.8.2"
 # renovate: datasource=github-releases depName=mikefarah/yq extractVersion=^v(?<version>.+)$
-ARG YQ_VERSION="4.53.3"
+ARG YQ_VERSION="4.53.4"
 
 # Keep these three in lockstep with qtsone/actions/release: the action's semantic-version
 # input default, plus the resolved versions of its two default extra-plugins. Renovate

@@ -28,7 +28,7 @@ ARG BUF_VERSION="1.72.0"
 # renovate: datasource=github-releases depName=oven-sh/bun extractVersion=^bun-v(?<version>.+)$
 ARG BUN_VERSION="1.4.0"
 # renovate: datasource=github-releases depName=cli/cli extractVersion=^v(?<version>.+)$
-ARG GH_VERSION="2.97.0"
+ARG GH_VERSION="2.98.0"
 # renovate: datasource=github-releases depName=kubernetes/kubernetes extractVersion=^v(?<version>.+)$
 ARG KUBECTL_VERSION="1.36.4"
 # kubernetes-sigs/kustomize also tags kyaml/ and cmd/config/ releases; the prefix in

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.8](https://github.com/qtsone/runner-image/compare/v1.4.7...v1.4.8) (2026-08-29)
+
+
+### Bug Fixes
+
+* **docker:** update dependency kubernetes/kubernetes to v1.37.0 ([#21](https://github.com/qtsone/runner-image/issues/21)) ([c09a8fb](https://github.com/qtsone/runner-image/commit/c09a8fb680c349062614845d7688565b1a2cc894))
+
 ## [1.4.7](https://github.com/qtsone/runner-image/compare/v1.4.6...v1.4.7) (2026-08-29)
 
 

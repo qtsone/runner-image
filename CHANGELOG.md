@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.9](https://github.com/qtsone/runner-image/compare/v1.4.8...v1.4.9) (2026-08-31)
+
+
+### Bug Fixes
+
+* **docker:** update dependency astral-sh/uv to v0.12.7 ([#22](https://github.com/qtsone/runner-image/issues/22)) ([59e1453](https://github.com/qtsone/runner-image/commit/59e14531995b61a8033c3ab1fafa3b83748ce1e8))
+
 ## [1.4.8](https://github.com/qtsone/runner-image/compare/v1.4.7...v1.4.8) (2026-08-29)
 
 

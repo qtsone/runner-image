@@ -22,13 +22,13 @@ ARG NODE_VERSION="24.20.0"
 ARG PYTHON_RELEASE_VERSION="3.14.7-31064857500"
 
 # renovate: datasource=github-releases depName=astral-sh/uv
-ARG UV_VERSION="0.12.8"
+ARG UV_VERSION="0.12.9"
 # renovate: datasource=github-releases depName=bufbuild/buf extractVersion=^v(?<version>.+)$
 ARG BUF_VERSION="1.72.0"
 # renovate: datasource=github-releases depName=oven-sh/bun extractVersion=^bun-v(?<version>.+)$
 ARG BUN_VERSION="1.4.0"
 # renovate: datasource=github-releases depName=cli/cli extractVersion=^v(?<version>.+)$
-ARG GH_VERSION="2.98.0"
+ARG GH_VERSION="2.99.0"
 # renovate: datasource=github-releases depName=kubernetes/kubernetes extractVersion=^v(?<version>.+)$
 ARG KUBECTL_VERSION="1.37.0"
 # kubernetes-sigs/kustomize also tags kyaml/ and cmd/config/ releases; the prefix in

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.12](https://github.com/qtsone/runner-image/compare/v1.4.11...v1.4.12) (2026-09-06)
+
+
+### Bug Fixes
+
+* **docker:** update dependency cli/cli to v2.100.0 ([#25](https://github.com/qtsone/runner-image/issues/25)) ([79c1080](https://github.com/qtsone/runner-image/commit/79c10809d02a535786712e5047e83d4786935f80))
+
 ## [1.4.11](https://github.com/qtsone/runner-image/compare/v1.4.10...v1.4.11) (2026-09-05)
 
 

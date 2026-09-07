@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.13](https://github.com/qtsone/runner-image/compare/v1.4.12...v1.4.13) (2026-09-07)
+
+
+### Bug Fixes
+
+* **docker:** update dependency oven-sh/bun to v1.4.1 ([#26](https://github.com/qtsone/runner-image/issues/26)) ([0141faf](https://github.com/qtsone/runner-image/commit/0141faf017bc64da032a8c35651558fc5f1a837a))
+
 ## [1.4.12](https://github.com/qtsone/runner-image/compare/v1.4.11...v1.4.12) (2026-09-06)
 
 

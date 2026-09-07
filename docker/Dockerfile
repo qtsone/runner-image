@@ -26,7 +26,7 @@ ARG UV_VERSION="0.12.9"
 # renovate: datasource=github-releases depName=bufbuild/buf extractVersion=^v(?<version>.+)$
 ARG BUF_VERSION="1.72.0"
 # renovate: datasource=github-releases depName=oven-sh/bun extractVersion=^bun-v(?<version>.+)$
-ARG BUN_VERSION="1.4.0"
+ARG BUN_VERSION="1.4.1"
 # renovate: datasource=github-releases depName=cli/cli extractVersion=^v(?<version>.+)$
 ARG GH_VERSION="2.100.0"
 # renovate: datasource=github-releases depName=kubernetes/kubernetes extractVersion=^v(?<version>.+)$

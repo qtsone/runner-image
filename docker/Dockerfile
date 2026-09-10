@@ -11,7 +11,7 @@ FROM ghcr.io/actions/actions-runner:${RUNNER_VERSION}
 # datasource marks non-LTS releases unstable and the versioning refuses a major that has
 # not reached its LTS date.
 # renovate: datasource=node-version depName=node versioning=node
-ARG NODE_VERSION="24.20.0"
+ARG NODE_VERSION="24.21.0"
 
 # actions/python-versions tags a release <python-version>-<build-id> and names the tarball
 # inside it by the python version alone. One pin, with the python version derived from it

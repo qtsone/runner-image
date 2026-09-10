@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.15](https://github.com/qtsone/runner-image/compare/v1.4.14...v1.4.15) (2026-09-10)
+
+
+### Bug Fixes
+
+* **docker:** update Node.js to v24.21.0 ([#28](https://github.com/qtsone/runner-image/issues/28)) ([e56ccae](https://github.com/qtsone/runner-image/commit/e56ccae687e1c500ac1ea2129cb1855b91daa07d))
+
 ## [1.4.14](https://github.com/qtsone/runner-image/compare/v1.4.13...v1.4.14) (2026-09-08)
 
 

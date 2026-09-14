@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.19](https://github.com/qtsone/runner-image/compare/v1.4.18...v1.4.19) (2026-09-14)
+
+
+### Bug Fixes
+
+* **docker:** update dependency bufbuild/buf to v1.73.0 ([#32](https://github.com/qtsone/runner-image/issues/32)) ([b834537](https://github.com/qtsone/runner-image/commit/b834537cf6edce7abaa040d33c221dcc378e198f))
+
 ## [1.4.18](https://github.com/qtsone/runner-image/compare/v1.4.17...v1.4.18) (2026-09-14)
 
 

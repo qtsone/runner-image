@@ -4,7 +4,7 @@
 # Every ARG below carries a `# renovate:` annotation so Renovate can track it; see
 # .github/renovate.json5. RUNNER_VERSION needs none — Renovate's dockerfile manager
 # resolves it through the FROM below on its own.
-ARG RUNNER_VERSION="2.336.0"
+ARG RUNNER_VERSION="2.337.0"
 FROM ghcr.io/actions/actions-runner:${RUNNER_VERSION}
 
 # node-version + `node` versioning together mean only LTS lines are ever offered: the

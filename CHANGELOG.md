@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.20](https://github.com/qtsone/runner-image/compare/v1.4.19...v1.4.20) (2026-09-15)
+
+
+### Bug Fixes
+
+* **docker:** update ghcr.io/actions/actions-runner Docker tag to v2.337.0 ([710f6f7](https://github.com/qtsone/runner-image/commit/710f6f7cf92d67039ad4feedb0c9d847b7675f07))
+
 ## [1.4.19](https://github.com/qtsone/runner-image/compare/v1.4.18...v1.4.19) (2026-09-14)
 
 

@@ -55,12 +55,11 @@ reinstalls from npm on every run, so a pre-installed copy is never used.
 The baked Node's `bin` directory is on `PATH`, so `node`, `npm`, and `semantic-release`
 work natively without a `setup-node` step — the same as GitHub-hosted runners.
 `semantic-release` is installed globally together with `@semantic-release/changelog` and
-`@semantic-release/git`: exactly what `qtsone/actions/release` installs at run time (its
-`semantic-version` input default plus its default `extra-plugins`). Keep the three
-`SEMANTIC_RELEASE_*` args in lockstep with that action when bumping either side — the action
-re-runs `npm install -g` on every release job, and that is only a fast no-op while the
-versions match. Renovate groups the three into a single PR and never automerges it, so the
-action can be bumped in the same breath.
+`@semantic-release/git`: the `semantic-version` default and default `extra-plugins` of
+`qtsone/actions/release`. That action skips its `npm install -g` only while the baked
+versions match, so keep the three `SEMANTIC_RELEASE_*` args in lockstep with it. Renovate
+groups them into a single PR and never automerges it, so the action can be bumped in the
+same breath.
 
 ## Getting a cache hit
 

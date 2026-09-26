@@ -30,7 +30,7 @@ ARG BUN_VERSION="1.4.2"
 # renovate: datasource=github-releases depName=cli/cli extractVersion=^v(?<version>.+)$
 ARG GH_VERSION="2.101.0"
 # renovate: datasource=github-releases depName=kubernetes/kubernetes extractVersion=^v(?<version>.+)$
-ARG KUBECTL_VERSION="1.37.0"
+ARG KUBECTL_VERSION="1.37.1"
 # kubernetes-sigs/kustomize also tags kyaml/ and cmd/config/ releases; the prefix in
 # extractVersion is what filters those out.
 # renovate: datasource=github-releases depName=kubernetes-sigs/kustomize extractVersion=^kustomize/v(?<version>.+)$

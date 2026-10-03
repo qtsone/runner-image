@@ -22,23 +22,23 @@ ARG NODE_VERSION="24.21.0"
 ARG PYTHON_RELEASE_VERSION="3.14.7-31064857500"
 
 # renovate: datasource=github-releases depName=astral-sh/uv
-ARG UV_VERSION="0.12.18"
+ARG UV_VERSION="0.12.21"
 # renovate: datasource=github-releases depName=bufbuild/buf extractVersion=^v(?<version>.+)$
 ARG BUF_VERSION="1.73.0"
 # renovate: datasource=github-releases depName=oven-sh/bun extractVersion=^bun-v(?<version>.+)$
 ARG BUN_VERSION="1.4.2"
 # renovate: datasource=github-releases depName=cli/cli extractVersion=^v(?<version>.+)$
-ARG GH_VERSION="2.101.0"
+ARG GH_VERSION="2.102.0"
 # renovate: datasource=github-releases depName=kubernetes/kubernetes extractVersion=^v(?<version>.+)$
-ARG KUBECTL_VERSION="1.37.0"
+ARG KUBECTL_VERSION="1.37.1"
 # kubernetes-sigs/kustomize also tags kyaml/ and cmd/config/ releases; the prefix in
 # extractVersion is what filters those out.
 # renovate: datasource=github-releases depName=kubernetes-sigs/kustomize extractVersion=^kustomize/v(?<version>.+)$
-ARG KUSTOMIZE_VERSION="5.8.1"
+ARG KUSTOMIZE_VERSION="5.8.2"
 # renovate: datasource=github-releases depName=jqlang/jq extractVersion=^jq-(?<version>.+)$
 ARG JQ_VERSION="1.8.2"
 # renovate: datasource=github-releases depName=mikefarah/yq extractVersion=^v(?<version>.+)$
-ARG YQ_VERSION="4.53.6"
+ARG YQ_VERSION="4.54.1"
 
 # Keep these three in lockstep with qtsone/actions/release: the action's semantic-version
 # input default, plus the resolved versions of its two default extra-plugins. Renovate

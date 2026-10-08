@@ -1,0 +1,207 @@
+# Detective control for main (QTS-414, QTS-603). The org is on GitHub Free, so
+# private repos have no branch protection: any token with Contents RW can commit
+# or force-push to main through the API. This workflow opens a `security-alert`
+# issue and fails whenever a commit reaches main without a merged PR, or through a
+# PR that skipped the four-eyes review, or main is force-pushed.
+#
+# This file is byte-identical in every gate repo — compare blob shas to prove it.
+# Repo-specific jobs belong in another workflow file.
+#
+# It is a control against mistakes, not against a compromised run: both machine
+# accounts' tokens carry the `workflow` scope, so they can edit or delete this file.
+name: main-push-audit
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: Commit on main to audit (drill for the alert path)
+        required: true
+
+permissions:
+  contents: read
+  pull-requests: read
+  issues: write
+
+concurrency:
+  group: main-push-audit-${{ github.run_id }}
+
+jobs:
+  audit:
+    # GitHub-hosted runners do not start for this org (billing), so this uses
+    # the same ARC runner selection as every other qtsone workflow.
+    runs-on: ${{ vars.GHA_RUNNER_OVERRIDE || (github.event.repository.custom_properties.GHA_RUNNER_TYPE == 'PRIVATE' && format('arc-{0}', github.event.repository.custom_properties.GHA_RUNNER_SIZE) || 'ubuntu-latest') }}
+    timeout-minutes: 5
+    steps:
+      - name: Audit pushed commits
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          ACTOR: ${{ github.actor }}
+          EVENT: ${{ github.event_name }}
+          FORCED: ${{ github.event.forced || false }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.event.after }}
+          DISPATCH_SHA: ${{ inputs.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+
+          # Company file §4. Changing either list is a merge-gate decision, and
+          # the file must then change in every gate repo at once.
+          MERGER=qtsone-reviewer
+          OWNER=ibacalu
+          RENOVATE_AUTOMERGE_REPOS="qtsone/cloud-1 qtsone/agentic-os qtsone/actions qtsone/runner-image"
+
+          # Not the push payload's `commits`: it is capped at 20 entries, and a
+          # merge commit brings every branch commit along in one push.
+          if [ "$EVENT" = workflow_dispatch ]; then
+            shas="$DISPATCH_SHA"
+          elif [ -z "${BEFORE//0/}" ]; then
+            shas="$AFTER"
+          else
+            shas=$(gh api --paginate "repos/$REPO/compare/$BEFORE...$AFTER?per_page=100" \
+              --jq '.commits[].sha') || shas="$AFTER"
+          fi
+
+          # A merge commit and each branch commit it brings in all link to the PR.
+          merged_prs() {
+            gh api "repos/$REPO/commits/$1/pulls" \
+              --jq '.[] | select(.merged_at != null and .base.ref == "main") | .number'
+          }
+
+          # qtsone/actions/release pushes its version bump straight to main with
+          # a deploy key. Exempt it only while it touches nothing but the
+          # changelog, so the exemption cannot carry code. `actions` itself
+          # writes the subject without the word `version`.
+          is_release_bump() {
+            gh api "repos/$REPO/commits/$1" --jq '
+              (.commit.message | test("^chore\\(release\\): (version )?v?[0-9]"))
+              and ([.files[].filename] == ["CHANGELOG.md"])'
+          }
+
+          # Reads the PR, not the commit: under a merge commit the git author is
+          # the merger, so only the PR records who wrote it and who merged it.
+          # `merged_by` is null in the commits/{sha}/pulls list; only pulls/{n}
+          # carries it. Warden's approval is a review or a `Warden-Verdict`
+          # comment — most merges carry only the comment.
+          # Prints `ok`, `owner`, or the reason the PR fails the gate.
+          pr_verdict() {
+            local author merger approvers
+            read -r author merger < <(gh api "repos/$REPO/pulls/$1" \
+              --jq '"\(.user.login) \(.merged_by.login // "none")"')
+            if [ "$merger" = "$OWNER" ]; then
+              echo owner
+              return
+            fi
+            if [ "$author" = "renovate[bot]" ] && [ "$merger" = "renovate[bot]" ] \
+              && [[ " $RENOVATE_AUTOMERGE_REPOS " == *" $REPO "* ]]; then
+              echo ok
+              return
+            fi
+            if [ "$merger" != "$MERGER" ]; then
+              echo "merged by $merger, not $MERGER"
+              return
+            fi
+            if [ "$author" = "$merger" ]; then
+              echo "author $author is also the merger"
+              return
+            fi
+            approvers=$(
+              gh api --paginate "repos/$REPO/pulls/$1/reviews" \
+                --jq '.[] | select(.state == "APPROVED") | .user.login'
+              gh api --paginate "repos/$REPO/issues/$1/comments" \
+                --jq '.[] | select(.body | test("(?m)^Warden-Verdict: approved QTS-")) | .user.login'
+            )
+            # The empty pattern drops the blank line an empty list leaves behind.
+            if grep -qvxF -e "$author" -e '' <<<"$approvers"; then
+              echo ok
+            else
+              echo "no approval from anyone but the author $author"
+            fi
+          }
+
+          declare -A verdicts=()
+          orphans=()
+          ungated=()
+          overrides=()
+          for sha in $shas; do
+            if [ "$(is_release_bump "$sha")" = true ]; then
+              echo "ok: $sha is a changelog-only release bump"
+              continue
+            fi
+            # The commit→PR link can lag the push by a few seconds after a merge.
+            prs=""
+            for delay in 10 10 10 0; do
+              prs=$(merged_prs "$sha")
+              [ -n "$prs" ] && break
+              sleep "$delay"
+            done
+            if [ -z "$prs" ]; then
+              echo "::error::$sha is on main without a merged PR"
+              orphans+=("$sha")
+              continue
+            fi
+            verdict=""
+            for pr in $prs; do
+              [ -n "${verdicts[$pr]:-}" ] || verdicts[$pr]=$(pr_verdict "$pr")
+              verdict=${verdicts[$pr]}
+              [ "$verdict" = ok ] || [ "$verdict" = owner ] && break
+            done
+            case "$verdict" in
+              ok) echo "ok: $sha belongs to reviewed PR #$pr" ;;
+              # An owner merge is an override, recorded rather than escalated
+              # (company file §4, QTS-1084).
+              owner)
+                echo "::warning::$sha came in through PR #$pr, merged by the owner (override)"
+                overrides+=("$sha (#$pr)")
+                ;;
+              *)
+                echo "::error::$sha came in through PR #$pr: $verdict"
+                ungated+=("$sha (#$pr: $verdict)")
+                ;;
+            esac
+          done
+
+          if [ ${#overrides[@]} -gt 0 ]; then
+            printf -- '- owner override: %s\n' "${overrides[@]}" >>"$GITHUB_STEP_SUMMARY"
+          fi
+
+          if [ "$FORCED" != true ] && [ ${#orphans[@]} -eq 0 ] && [ ${#ungated[@]} -eq 0 ]; then
+            exit 0
+          fi
+
+          reasons=()
+          [ "$FORCED" = true ] && reasons+=("force-push to main")
+          [ ${#orphans[@]} -gt 0 ] && reasons+=("commit on main without a merged PR")
+          [ ${#ungated[@]} -gt 0 ] && reasons+=("PR merged without four-eyes review")
+          reason=$(printf '%s; ' "${reasons[@]}")
+          reason=${reason%; }
+          [ "$EVENT" = workflow_dispatch ] && reason="[drill] $reason"
+
+          ungated_list=""
+          [ ${#ungated[@]} -gt 0 ] && ungated_list=$(printf -- '\n  - %s' "${ungated[@]}")
+          body=$(cat <<MD
+          **$reason**
+
+          - Trigger: \`$EVENT\`
+          - Pusher: @$ACTOR
+          - Forced: \`$FORCED\`
+          - Before → after: \`${BEFORE:-n/a}\` → \`${AFTER:-n/a}\`
+          - Commits without a merged PR: ${orphans[*]:-none}
+          - Commits from a PR that failed the gate (merged by \`$MERGER\`, author ≠ merger, approved by a non-author):${ungated_list:- none}
+          - Run: $RUN_URL
+
+          Check the commits, revert what should not be there, then close this issue.
+          A force-push can drop remote history; recover it from a local clone.
+          MD
+          )
+
+          gh label create security-alert --repo "$REPO" --color B60205 \
+            --description "Raised by main-push-audit" 2>/dev/null || true
+          gh issue create --repo "$REPO" --label security-alert \
+            --title "security-alert: $reason (${AFTER:-$DISPATCH_SHA})" --body "$body"
+          echo "::error::$reason"
+          exit 1

@@ -30,9 +30,10 @@ concurrency:
 
 jobs:
   audit:
-    # GitHub-hosted runners do not start for this org (billing), so this uses
-    # the same ARC runner selection as every other qtsone workflow.
-    runs-on: ${{ vars.GHA_RUNNER_OVERRIDE || (github.event.repository.custom_properties.GHA_RUNNER_TYPE == 'PRIVATE' && format('arc-{0}', github.event.repository.custom_properties.GHA_RUNNER_SIZE) || 'ubuntu-latest') }}
+    # GitHub-hosted runners do not start for private repos in this org (billing),
+    # so those use ARC. Public repos must stay on ubuntu-latest: the ARC runner
+    # group does not serve public repos, and a job sent there queues forever.
+    runs-on: ${{ vars.GHA_RUNNER_OVERRIDE || (github.event.repository.private && github.event.repository.custom_properties.GHA_RUNNER_TYPE == 'PRIVATE' && format('arc-{0}', github.event.repository.custom_properties.GHA_RUNNER_SIZE) || 'ubuntu-latest') }}
     timeout-minutes: 5
     steps:
       - name: Audit pushed commits
